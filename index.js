@@ -40,6 +40,24 @@ io.on("connection", (socket) => {
       socket.emit("playersConnected");
     }
   });
+
+  socket.on("p1Choice", (data) => {
+    let rpsValue = data.rpsValue;
+    rooms[data.roomUniqueId].p1Choice = rpsValue;
+    socket.to(data.roomUniqueId).emit("p1Choice", { rpsValue: data.rpsValue });
+    // if (rooms[data.roomUniqueId].p2Choice != null) {
+    //   declareWinner(data.roomUniqueId);
+    // }
+  });
+
+  socket.on("p2Choice", (data) => {
+    let rpsValue = data.rpsValue;
+    rooms[data.roomUniqueId].p2Choice = rpsValue;
+    socket.to(data.roomUniqueId).emit("p2Choice", { rpsValue: data.rpsValue });
+    // if (rooms[data.roomUniqueId].p1Choice != null) {
+    //   declareWinner(data.roomUniqueId);
+    // }
+  });
 });
 
 server.listen(3000, () => {

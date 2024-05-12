@@ -2,8 +2,26 @@ console.log("client.js loaded");
 const socket = io();
 let roomUniqueId = null;
 
+let player1 = false;
+
 function сreateGame() {
+  player1 = true;
+  console.log("player1");
   socket.emit("createGame");
+}
+
+function sendChoice(rpsValue) {
+  const choiceEvent = player1 ? "p1Choice" : "p2Choice";
+  socket.emit(choiceEvent, {
+    rpsValue: rpsValue,
+    roomUniqueId: roomUniqueId,
+  });
+  let playerChoiceButton = document.createElement("button");
+  playerChoiceButton.style.display = "block";
+  //playerChoiceButton.classList.add(rpsValue.toString().toLowerCase());
+  playerChoiceButton.innerText = rpsValue;
+  document.getElementById("player1Choice").innerHTML = "";
+  document.getElementById("player1Choice").appendChild(playerChoiceButton);
 }
 
 function joinGame() {
@@ -11,6 +29,17 @@ function joinGame() {
   console.log(roomUniqueId);
   socket.emit("joinGame", { roomUniqueId: roomUniqueId });
 }
+
+function createOpponentChoiceButton(data) {
+  document.getElementById('opponentState').innerHTML = "Opponent made a choice";
+  let opponentButton = document.createElement('button');
+  opponentButton.id = 'opponentButton';
+  //opponentButton.classList.add(data.rpsValue.toString().toLowerCase());
+  opponentButton.style.display = 'none';
+  opponentButton.innerText = data.rpsValue;
+  document.getElementById('player2Choice').appendChild(opponentButton);
+}
+
 
 socket.on("newGame", (data) => {
   roomUniqueId = data.roomUniqueId;
@@ -40,7 +69,18 @@ socket.on("newGame", (data) => {
 socket.on("playersConnected", (data) => {
   document.getElementById("initial").style.display = "none";
   document.getElementById("waitingArea").style.display = "none";
-  document.getElementById('gameArea').style.display = 'block';
+  document.getElementById("gameArea").style.display = "block";
+});
 
+socket.on("p1Choice",(data)=>{
+  if(!player1) {
+      createOpponentChoiceButton(data);
+  }
+});
+
+socket.on("p2Choice",(data)=>{
+  if(player1) {
+      createOpponentChoiceButton(data);
+  }
 });
 
