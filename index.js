@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const room = {};
+const rooms = {};
 
 app.use(express.static(path.join(__dirname, "client")));
 
@@ -28,11 +28,18 @@ io.on("connection", (socket) => {
   socket.on("createGame", () => {
     const roomUniqueId = makeid(12);
     console.log(roomUniqueId);
-    /* rooms[roomUniqueId] = {};
-     socket.join(roomUniqueId);
-     socket.emit("newGame", { roomUniqueId: roomUniqueId }); */
+    rooms[roomUniqueId] = {};
+    socket.join(roomUniqueId);
+    socket.emit("newGame", { roomUniqueId: roomUniqueId });
   });
 
+  socket.on("joinGame", (data) => {
+    if (rooms[data.roomUniqueId] != null) {
+      socket.join(data.roomUniqueId);
+      socket.to(data.roomUniqueId).emit("playersConnected", {});
+      socket.emit("playersConnected");
+    }
+  });
 });
 
 server.listen(3000, () => {
