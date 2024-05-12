@@ -84,3 +84,23 @@ socket.on("p2Choice",(data)=>{
   }
 });
 
+socket.on("result",(data)=>{
+  let winnerText = '';
+  if(data.winner != 'd') {
+      if(data.winner == 'p1' && player1) {
+          winnerText = 'You win';
+      } else if(data.winner == 'p1') {
+          winnerText = 'You lose';
+      } else if(data.winner == 'p2' && !player1) {
+          winnerText = 'You win';
+      } else if(data.winner == 'p2') {
+          winnerText = 'You lose';
+      }
+  } else {
+      winnerText = `It's a draw`;
+  }
+  document.getElementById('opponentState').style.display = 'none';
+  document.getElementById('opponentButton').style.display = 'block';
+  document.getElementById('winnerArea').innerHTML = winnerText;
+});
+
